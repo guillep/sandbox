@@ -30,6 +30,14 @@ Process >> effectiveProcess: aProcess [
 ]
 
 { #category : '*Domains' }
+Process >> initialize [
+	super initialize.
+
+	terminating := false.
+	currentDomainIsDefault := true
+]
+
+{ #category : '*Domains' }
 Process >> popScope [
 
 	<nonDomainMediated>

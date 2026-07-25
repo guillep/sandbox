@@ -7,6 +7,9 @@ Sandbox do: [ :s |
 Class {
 	#name : 'Sandbox',
 	#superclass : 'Domain',
+	#instVars : [
+		'ownedBehaviors'
+	],
 	#category : 'Domains',
 	#package : 'Domains'
 }
@@ -24,13 +27,14 @@ Sandbox >> allocateClass: aClass [
 	| newInstance |
 	Processor activeProcess currentDomain: nil.
 	newInstance := aClass doBasicNew.
+	
+	self own: newInstance.
 
-	owned add: newInstance.
 	"Add could make the array grow, thus we need to own it too.
 	If the array did not grow the following line will do nothing because the array is already there.
 	If the array did grow, it will not grow again right away, the next grow threshold is faaar away.
 	Should we remove the old array?"
-	owned add: owned array.
+	self own: owned array.
 	
 	Processor activeProcess currentDomain: self.
 	^ newInstance
@@ -43,7 +47,15 @@ Sandbox >> allocateClass: aClass size: sizeRequested [
 	| newInstance |
 	Processor activeProcess currentDomain: nil.
 	newInstance := aClass doBasicNew: sizeRequested.
-	owned add: newInstance.
+	
+	self own: newInstance.
+	
+	"Add could make the array grow, thus we need to own it too.
+	If the array did not grow the following line will do nothing because the array is already there.
+	If the array did grow, it will not grow again right away, the next grow threshold is faaar away.
+	Should we remove the old array?"
+	self own: owned array.
+	
 	Processor activeProcess currentDomain: self.
 	^ newInstance
 ]
@@ -70,13 +82,28 @@ Sandbox >> initialize [
 	owned := IdentitySet new.
 	owned add: self.
 	owned add: owned.
-	owned add: owned array
+	owned add: owned array.
+	
+	"Behaviors cannot be hashed before they are ready.
+	We capture them at basicNew and they have no superclass, method dict, nor format.
+	Store them in an ordered collection instead"
+	ownedBehaviors := OrderedCollection new.
 ]
 
 { #category : 'writing' }
-Sandbox >> own: anObject [
+Sandbox >> own: newInstance [
 
-	owned add: anObject
+	newInstance isClass
+		ifTrue: [ ownedBehaviors add: newInstance ]
+		ifFalse: [ owned add: newInstance ]
+]
+
+{ #category : 'writing' }
+Sandbox >> owns: newInstance [
+
+	^ newInstance isClass
+		ifTrue: [ ownedBehaviors includes: newInstance ]
+		ifFalse: [ owned includes: newInstance ]
 ]
 
 { #category : 'accessing' }
@@ -98,7 +125,9 @@ Sandbox >> shallowCopy: anObject [
 	| newInstance |
 	Processor activeProcess currentDomain: nil.
 	newInstance := anObject doShallowCopy.
-	owned add: newInstance.
+	
+	self own: newInstance.
+	
 	Processor activeProcess currentDomain: self.
 	^ newInstance
 ]
@@ -107,11 +136,11 @@ Sandbox >> shallowCopy: anObject [
 Sandbox >> writeSlot: slot on: object value: value [
 
 	<nonDomainMediated>
-	(owned includes: object) ifTrue: [
+	(self owns: object) ifTrue: [
 		^ slot write: value to: object.
 	].
 	
 	"Nope!"
 	Processor activeProcess popScope.
-	self error
+	self error: 'Fede no te escapes'
 ]
