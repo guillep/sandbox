@@ -1,4 +1,0 @@
-*Domains
-rawIR
-	
-	^ ir

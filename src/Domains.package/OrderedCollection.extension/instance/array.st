@@ -1,3 +1,0 @@
-*Domains
-array
-	^ array

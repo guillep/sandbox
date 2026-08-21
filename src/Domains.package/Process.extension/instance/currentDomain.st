@@ -1,5 +1,0 @@
-*Domains
-currentDomain
-
-	<nonDomainMediated>
-	^ currentDomain
