@@ -7,7 +7,7 @@ ClassVariable >> emitStore: methodBuilder [
 	
 	| tempName |
 
-	(true or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)])
+	(Domain isActive not or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)])
 		ifTrue: [ 
 			methodBuilder storeIntoLiteralVariable: self.
 			^ self ].
@@ -44,10 +44,11 @@ ClassVariable >> emitStore: methodBuilder [
 { #category : '*Domains' }
 ClassVariable >> emitValue: methodBuilder [
 
-	true ifFalse: [ ^ self ].
-	(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated) ifTrue: [
+	(Domain isActive not or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)]) ifTrue: [
 			methodBuilder pushLiteralVariable: self.
-			^ self ]. "thisProcess currentDomainIsDefault"
+			^ self ].
+		
+	"thisProcess currentDomainIsDefault"
 	methodBuilder pushThisProcess.
 	methodBuilder send: #currentDomainIsDefault.
 	methodBuilder jumpAheadTo: #nonDefaultDomain if: false.

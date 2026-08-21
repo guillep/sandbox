@@ -23,10 +23,3 @@ Object >> doShallowCopy [
 			index := index - 1].
 	^ newObject
 ]
-
-{ #category : '*Domains' }
-Object >> shallowCopy [
-
-	Processor activeProcess currentDomainIsDefault ifTrue: [ ^ self doShallowCopy ].
-	^ Processor activeProcess currentDomain shallowCopy: self
-]

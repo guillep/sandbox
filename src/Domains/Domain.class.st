@@ -5,9 +5,36 @@ Class {
 		'previous',
 		'owned'
 	],
+	#classVars : [
+		'IsActive'
+	],
 	#category : 'Domains',
 	#package : 'Domains'
 }
+
+{ #category : 'testing' }
+Domain class >> activate [
+
+	IsActive ifTrue: [ ^ self ].
+	IsActive := true.
+	OpalCompiler recompileAll.
+]
+
+{ #category : 'testing' }
+Domain class >> deactivate [
+
+	IsActive ifFalse: [ ^ self ].
+	IsActive := false.
+	OpalCompiler recompileAll.
+]
+
+{ #category : 'testing' }
+Domain class >> isActive [
+
+	<nonDomainMediated>
+	"By default domains are not active"
+	^ IsActive ifNil: [ IsActive := false ]
+]
 
 { #category : 'writing' }
 Domain >> do: aBlock [

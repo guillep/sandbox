@@ -1,20 +1,6 @@
 Extension { #name : 'Behavior' }
 
 { #category : '*Domains' }
-Behavior >> basicNew [
-
-	thisProcess currentDomainIsDefault ifTrue: [ ^ self doBasicNew ].
-	^ thisProcess currentDomain allocateClass: self
-]
-
-{ #category : '*Domains' }
-Behavior >> basicNew: sizeRequested [
-
-	thisProcess currentDomainIsDefault ifTrue: [ ^ self doBasicNew: sizeRequested ].
-	^ thisProcess currentDomain allocateClass: self size: sizeRequested
-]
-
-{ #category : '*Domains' }
 Behavior >> doBasicNew [
 	"Primitive. Answer an instance of the receiver (which is a class) with no
 	 indexable variables. Fail if the class is indexable. Essential. See Object

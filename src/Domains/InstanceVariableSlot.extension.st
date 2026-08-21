@@ -7,7 +7,7 @@ InstanceVariableSlot >> emitStore: methodBuilder [
 	
 	| tempName |
 
-	(false or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)])
+	(Domain isActive not or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)])
 		ifTrue: [ 
 			methodBuilder storeInstVar: index.
 			^ self ].
@@ -45,7 +45,7 @@ InstanceVariableSlot >> emitStore: methodBuilder [
 { #category : '*Domains' }
 InstanceVariableSlot >> emitValue: methodBuilder [
 
-	true
+	Domain isActive not
 		ifTrue: [ methodBuilder pushInstVar: index ]
 		ifFalse: [
 				(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated) ifTrue: [

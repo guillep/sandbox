@@ -13,10 +13,3 @@ Interval class >> doBasicNew [
 	OutOfMemory signal.
 	^ self new  "retry if user proceeds"
 ]
-
-{ #category : '*Domains' }
-Interval class >> new [
-
-	thisProcess currentDomainIsDefault ifTrue: [ ^ self doBasicNew ].
-	^ thisProcess currentDomain allocateClass: self
-]
