@@ -7,7 +7,7 @@ ClassVariable >> emitStore: methodBuilder [
 	
 	| tempName |
 
-	(Domain isActive not or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)])
+	(true or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)])
 		ifTrue: [ 
 			methodBuilder storeIntoLiteralVariable: self.
 			^ self ].
@@ -44,7 +44,7 @@ ClassVariable >> emitStore: methodBuilder [
 { #category : '*Domains' }
 ClassVariable >> emitValue: methodBuilder [
 
-	(Domain isActive not or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)]) ifTrue: [
+	(true or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)]) ifTrue: [
 			methodBuilder pushLiteralVariable: self.
 			^ self ].
 		
