@@ -98,10 +98,22 @@ Sandbox >> initialize [
 { #category : 'writing' }
 Sandbox >> own: newInstance [
 
-	owned isImmediateObject ifTrue: [ ^ self ].
+	owned isImmediateObject ifTrue: [ ^ newInstance ].
 	newInstance isClass
 		ifTrue: [ ownedBehaviors add: newInstance ]
-		ifFalse: [ owned add: newInstance ]
+		ifFalse: [ owned add: newInstance ].
+		
+	^newInstance 
+]
+
+{ #category : 'writing' }
+Sandbox >> ownContext: newInstance [
+
+	<nonDomainMediated>
+	Processor activeProcess currentDomain: nil.
+	owned add: newInstance.
+	Processor activeProcess currentDomain: self.
+	^newInstance 
 ]
 
 { #category : 'writing' }
