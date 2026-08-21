@@ -98,7 +98,7 @@ Sandbox >> initialize [
 { #category : 'writing' }
 Sandbox >> own: newInstance [
 
-	owned isImmediateObject ifTrue: [ ^ newInstance ].
+	newInstance isImmediateObject ifTrue: [ ^ newInstance ].
 	newInstance isClass
 		ifTrue: [ ownedBehaviors add: newInstance ]
 		ifFalse: [ owned add: newInstance ].

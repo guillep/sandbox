@@ -13,3 +13,11 @@ DelaySemaphoreScheduler >> schedule: aDelay [
 	delayToStart := aDelay.
 	timingSemaphore signal. "Transfer execution to back-end #scheduleAtTimingPriority"
 ]
+
+{ #category : '*Domains' }
+DelaySemaphoreScheduler >> unschedule: aDelay [
+	<nonDomainMediated>
+	readyToUnschedule  wait.  "Starts signalled. Resignalled from back-end #unscheduleAtTimingPriority"
+	delayToStop := aDelay.
+	timingSemaphore signal. "Transfer execution to back-end #unscheduleAtTimingPriority"
+]
