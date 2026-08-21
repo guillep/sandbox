@@ -8,7 +8,8 @@ Class {
 	#name : 'Sandbox',
 	#superclass : 'Domain',
 	#instVars : [
-		'ownedBehaviors'
+		'ownedBehaviors',
+		'classVarValues'
 	],
 	#category : 'Domains',
 	#package : 'Domains'
@@ -75,7 +76,7 @@ Sandbox >> do: aBlock [
 					  e pass ] ] ensure: [ popped ifFalse: [ Processor activeProcess popScope ] ]
 ]
 
-{ #category : 'writing' }
+{ #category : 'initialization' }
 Sandbox >> initialize [
 	super initialize.
 
@@ -88,11 +89,16 @@ Sandbox >> initialize [
 	We capture them at basicNew and they have no superclass, method dict, nor format.
 	Store them in an ordered collection instead"
 	ownedBehaviors := OrderedCollection new.
+	
+	classVarValues := Dictionary new.
+	owned add: classVarValues.
+	owned add: classVarValues array.
 ]
 
 { #category : 'writing' }
 Sandbox >> own: newInstance [
 
+	owned isImmediateObject ifTrue: [ ^ self ].
 	newInstance isClass
 		ifTrue: [ ownedBehaviors add: newInstance ]
 		ifFalse: [ owned add: newInstance ]
@@ -119,6 +125,34 @@ Sandbox >> previous: aPreviousScope [
 ]
 
 { #category : 'writing' }
+Sandbox >> readClassVariable: slot [
+
+	<nonDomainMediated>	
+	"Well, you can read a class variable, but only a copy/memento of the original.
+	This way we will be able to write into it."
+	| value val |
+	value := classVarValues at: slot ifAbsent: nil.
+	
+	value
+		ifNil: [
+			val := slot value.
+			val isBehavior
+				ifTrue: [ val ]
+				ifFalse: [ val := val copy ]]
+		ifNotNil: [ val := value ].
+	
+	classVarValues at: slot put: val.
+	^ val
+]
+
+{ #category : 'writing' }
+Sandbox >> readSlot: slot on: object [
+
+	<nonDomainMediated>
+	^ slot read: object
+]
+
+{ #category : 'writing' }
 Sandbox >> shallowCopy: anObject [
 
 	<nonDomainMediated>
@@ -133,6 +167,15 @@ Sandbox >> shallowCopy: anObject [
 ]
 
 { #category : 'writing' }
+Sandbox >> writeClassVariable: slot value: value [
+
+	<nonDomainMediated>	
+	"Nope!"
+	classVarValues at: slot put: value.
+	^ value
+]
+
+{ #category : 'writing' }
 Sandbox >> writeSlot: slot on: object value: value [
 
 	<nonDomainMediated>
@@ -142,5 +185,5 @@ Sandbox >> writeSlot: slot on: object value: value [
 	
 	"Nope!"
 	Processor activeProcess popScope.
-	self error: 'Fede no te escapes'
+	self error: 'Se te escapo la escritura'
 ]

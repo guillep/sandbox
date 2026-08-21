@@ -14,14 +14,14 @@ Domain >> do: aBlock [
 
 	| popped |
 	popped := false.
-	Processor activeProcess pushScope: self.
+	thisProcess pushScope: self.
 	^ [
 		  [ aBlock value: self ]
 			  on: Exception
 			  do: [ :e |
-					  Processor activeProcess popScope.
+					  thisProcess popScope.
 					  popped := true.
-					  e pass ] ] ensure: [ popped ifFalse: [ Processor activeProcess popScope ] ]
+					  e pass ] ] ensure: [ popped ifFalse: [ thisProcess popScope ] ]
 ]
 
 { #category : 'accessing' }

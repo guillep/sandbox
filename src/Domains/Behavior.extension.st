@@ -3,15 +3,15 @@ Extension { #name : 'Behavior' }
 { #category : '*Domains' }
 Behavior >> basicNew [
 
-	Processor activeProcess currentDomainIsDefault ifTrue: [ ^ self doBasicNew ].
-	^ Processor activeProcess currentDomain allocateClass: self
+	thisProcess currentDomainIsDefault ifTrue: [ ^ self doBasicNew ].
+	^ thisProcess currentDomain allocateClass: self
 ]
 
 { #category : '*Domains' }
 Behavior >> basicNew: sizeRequested [
 
-	Processor activeProcess currentDomainIsDefault ifTrue: [ ^ self doBasicNew: sizeRequested ].
-	^ Processor activeProcess currentDomain allocateClass: self size: sizeRequested
+	thisProcess currentDomainIsDefault ifTrue: [ ^ self doBasicNew: sizeRequested ].
+	^ thisProcess currentDomain allocateClass: self size: sizeRequested
 ]
 
 { #category : '*Domains' }

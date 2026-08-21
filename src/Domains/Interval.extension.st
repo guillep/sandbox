@@ -17,6 +17,6 @@ Interval class >> doBasicNew [
 { #category : '*Domains' }
 Interval class >> new [
 
-	Processor activeProcess currentDomainIsDefault ifTrue: [ ^ self doBasicNew ].
-	^ Processor activeProcess currentDomain allocateClass: self
+	thisProcess currentDomainIsDefault ifTrue: [ ^ self doBasicNew ].
+	^ thisProcess currentDomain allocateClass: self
 ]
