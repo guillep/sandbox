@@ -28,6 +28,13 @@ Domain class >> deactivate [
 	OpalCompiler recompileAll.
 ]
 
+{ #category : 'class initialization' }
+Domain class >> initialize [
+
+	"When I'm loaded, I will reset all processes to have the default domain"
+	Process allInstances do: [ :p | p currentDomain: nil ]
+]
+
 { #category : 'testing' }
 Domain class >> isActive [
 
