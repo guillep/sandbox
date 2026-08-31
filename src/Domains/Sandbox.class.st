@@ -80,19 +80,19 @@ Sandbox >> do: aBlock [
 Sandbox >> initialize [
 	super initialize.
 
-	owned := IdentitySet new.
-	owned add: self.
+	owned := WeakIdentitySet new.
+	"owned add: self.
 	owned add: owned.
-	owned add: owned array.
+	owned add: owned array."
 	
 	"Behaviors cannot be hashed before they are ready.
 	We capture them at basicNew and they have no superclass, method dict, nor format.
 	Store them in an ordered collection instead"
-	ownedBehaviors := OrderedCollection new.
+	ownedBehaviors := WeakOrderedCollection new.
 	
-	classVarValues := Dictionary new.
+	"classVarValues := Dictionary new.
 	owned add: classVarValues.
-	owned add: classVarValues array.
+	owned add: classVarValues array."
 ]
 
 { #category : 'writing' }
