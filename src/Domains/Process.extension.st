@@ -34,6 +34,7 @@ Process >> initialize [
 	super initialize.
 
 	terminating := false.
+	shouldOverflow := true.
 	currentDomainIsDefault := true
 ]
 
