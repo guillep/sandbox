@@ -32,7 +32,9 @@ Domain class >> deactivate [
 Domain class >> initialize [
 
 	"When I'm loaded, I will reset all processes to have the default domain"
-	Process allInstances do: [ :p | p currentDomain: nil ]
+	Process allInstances do: [ :p | 
+		p currentDomain: nil.
+		p shouldOverflow: true ]
 ]
 
 { #category : 'testing' }
