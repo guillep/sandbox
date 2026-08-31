@@ -99,7 +99,7 @@ Sandbox >> initialize [
 Sandbox >> own: newInstance [
 
 	newInstance isImmediateObject ifTrue: [ ^ newInstance ].
-	newInstance isClass
+	newInstance isBehavior
 		ifTrue: [ ownedBehaviors add: newInstance ]
 		ifFalse: [ owned add: newInstance ].
 		
