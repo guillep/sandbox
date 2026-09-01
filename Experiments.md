@@ -46,12 +46,11 @@ Que aprendimos de la biblioteca y sus tests:
 - tests que no son tests pero "reglas de calidad"
 
 ## Clap
-- 5945 green
-- 32 red
+- 142 green
+- 4 red
 
-Que aprendimos del sandbox: 
-Que aprendimos de la biblioteca y sus tests: 
 Que aprendimos de Pharo:
+- Files require Finalization
 
 ## AST, Opal
 - 5945 green
