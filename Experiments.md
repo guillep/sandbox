@@ -52,29 +52,34 @@ Que aprendimos de la biblioteca y sus tests:
 Que aprendimos de Pharo:
 - Files require Finalization
 
-## AST, Opal
-- 5945 green
-- 32 red
-
-Que aprendimos del sandbox: 
-Que aprendimos de la biblioteca y sus tests: 
-Que aprendimos de Pharo:
-
 ## FileSystem
-- 5945 green
-- 32 red
+- 395 green
+- 104 red
+- 2 yellow
 
-Que aprendimos del sandbox: 
 Que aprendimos de la biblioteca y sus tests: 
-Que aprendimos de Pharo:
+- tiene tests no repetibles, quiz
+
+NOTA: Redo after fixing finalization + test resources.
 
 ## Enlumineur
-- 5945 green
-- 32 red
+- 294 green
+- 4 red
 
-Que aprendimos del sandbox: 
 Que aprendimos de la biblioteca y sus tests: 
-Que aprendimos de Pharo:
+- global state
+- 
+## Microdown
+- 365 green
+- 338 red
+- 4 yellow
+
+Que aprendimos de la biblioteca y sus tests: 
+- Opens a UI window
+- hay tests que atrapan Error genericamente y no distinguen nuestros write errors or stack overflow
+- regex matcher in a global is stateful. Is it shareable?
+- Morphic render! hits in a global cache of glyphs
+
 
 ## Kernel
 - 5945 green
@@ -89,13 +94,6 @@ Kernel-Tests
 
 Que aprendimos? ProtoObject no anda con el sandbox, no lo podemos ownear.
 
-## Microdown
-- 5945 green
-- 32 red
-
-Que aprendimos del sandbox: 
-Que aprendimos de la biblioteca y sus tests: 
-Que aprendimos de Pharo:
 
 ## Refactoring
 - 5945 green
@@ -113,10 +111,19 @@ Que aprendimos del sandbox:
 Que aprendimos de la biblioteca y sus tests: 
 Que aprendimos de Pharo:
 
+## AST, Opal
+- 5945 green
+- 32 red
+
+Que aprendimos del sandbox: 
+Que aprendimos de la biblioteca y sus tests: 
+Que aprendimos de Pharo:
+
+
 # Ideas
 
 - Global state should start clean
 - Class vars and inst class vars
 - How to not affect the ones defined by Class and Behavior
 
-- 
+- Are there tests that are green although they are not green? catch(Error) catches everything
