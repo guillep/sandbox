@@ -36,32 +36,83 @@ Que aprendimos de Pharo:
 - Deprecations are global
 
 ## Collections
-- 5977 green
+- 5945 green
+- 32 red
 
+Que aprendimos de la biblioteca y sus tests: 
+- progress bar
+- global state
+- timeout/infinite recursions -> this is because of the stack overflow changes we did
+- tests que no son tests pero "reglas de calidad"
 
 ## Clap
+- 5945 green
+- 32 red
 
-147 tests all green
+Que aprendimos del sandbox: 
+Que aprendimos de la biblioteca y sus tests: 
+Que aprendimos de Pharo:
 
 ## AST, Opal
+- 5945 green
+- 32 red
 
-7933 green
+Que aprendimos del sandbox: 
+Que aprendimos de la biblioteca y sus tests: 
+Que aprendimos de Pharo:
 
 ## FileSystem
+- 5945 green
+- 32 red
+
+Que aprendimos del sandbox: 
+Que aprendimos de la biblioteca y sus tests: 
+Que aprendimos de Pharo:
 
 ## Enlumineur
+- 5945 green
+- 32 red
+
+Que aprendimos del sandbox: 
+Que aprendimos de la biblioteca y sus tests: 
+Que aprendimos de Pharo:
 
 ## Kernel
+- 5945 green
+- 32 red
+
+Que aprendimos del sandbox: 
+Que aprendimos de la biblioteca y sus tests: 
+Que aprendimos de Pharo:
+
 
 Kernel-Tests 
 
 Que aprendimos? ProtoObject no anda con el sandbox, no lo podemos ownear.
 
 ## Microdown
+- 5945 green
+- 32 red
+
+Que aprendimos del sandbox: 
+Que aprendimos de la biblioteca y sus tests: 
+Que aprendimos de Pharo:
 
 ## Refactoring
+- 5945 green
+- 32 red
+
+Que aprendimos del sandbox: 
+Que aprendimos de la biblioteca y sus tests: 
+Que aprendimos de Pharo:
 
 ## Roassal
+- 5945 green
+- 32 red
+
+Que aprendimos del sandbox: 
+Que aprendimos de la biblioteca y sus tests: 
+Que aprendimos de Pharo:
 
 # Ideas
 
