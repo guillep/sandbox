@@ -75,6 +75,7 @@ Que aprendimos de la biblioteca y sus tests:
 - 4 yellow
 
 Que aprendimos de la biblioteca y sus tests: 
+- Depends on Zinc
 - Opens a UI window
 - hay tests que atrapan Error genericamente y no distinguen nuestros write errors or stack overflow
 - regex matcher in a global is stateful. Is it shareable?
