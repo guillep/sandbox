@@ -78,7 +78,7 @@ Que aprendimos de la biblioteca y sus tests:
 - Opens a UI window
 - hay tests que atrapan Error genericamente y no distinguen nuestros write errors or stack overflow
 - regex matcher in a global is stateful. Is it shareable?
-- Morphic render! hits in a global cache of glyphs
+- Morphic render! hits in a global cache of glyphs 
 
 
 ## Kernel
@@ -127,3 +127,21 @@ Que aprendimos de Pharo:
 - How to not affect the ones defined by Class and Behavior
 
 - Are there tests that are green although they are not green? catch(Error) catches everything
+
+
+#Scripties 
+
+```|stackSize packageName | 
+stackSize := 8.
+packageName := 'Microdown-Tests'.
+tests := (packageName asPackage testSuite tests flatCollect:[ :r | r class = TestSuite ifTrue:[ r tests ] ifFalse:[ {r} ]  ])  collect: [ : t |
+	
+	[t debug. nil ] on: Error, AssertionFailure, TestFailure   do: [  :e | t-> (( e signalerContext stackOfSize: stackSize) collect: [ : s | s selector  ] )] 
+	 ]
+.
+tests := tests reject:#isNil.
+
+tests := (tests groupedBy:#value ) sorted: #size asSortFunction reversed.
+
+sorts := tests collect: [  : t | t first key debug  ]
+```
