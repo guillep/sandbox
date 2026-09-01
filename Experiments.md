@@ -87,8 +87,24 @@ Que aprendimos de la biblioteca y sus tests:
 - 32 red
 
 Que aprendimos del sandbox: 
+
+
 Que aprendimos de la biblioteca y sus tests: 
+
+Algunos tests esperan una excpetion particular de forma implicita.  
+
+```testOneCanProceedWhenIntroducingCapitalizedInstanceVariables
+
+	| class |
+	[ class := classFactory make: [ :aBuilder | aBuilder slots: #(X Y) ] ]
+		on: Exception
+		do: [ :ex | ex resume ].
+	self assert: (testingEnvironment keys includes: class name)
+```
 Que aprendimos de Pharo:
+
+
+
 
 
 Kernel-Tests 
@@ -130,7 +146,7 @@ Que aprendimos de Pharo:
 - Are there tests that are green although they are not green? catch(Error) catches everything
 
 
-#Scripties 
+# Scripties 
 
 ```|stackSize packageName | 
 stackSize := 8.
