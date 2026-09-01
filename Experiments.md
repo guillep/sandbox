@@ -91,7 +91,7 @@ Que aprendimos del sandbox:
 
 Que aprendimos de la biblioteca y sus tests: 
 
-Algunos tests esperan una excpetion particular de forma implicita.  
+- Algunos tests esperan una excpetion particular de forma implicita.  
 
 ```testOneCanProceedWhenIntroducingCapitalizedInstanceVariables
 
@@ -101,6 +101,9 @@ Algunos tests esperan una excpetion particular de forma implicita.
 		do: [ :ex | ex resume ].
 	self assert: (testingEnvironment keys includes: class name)
 ```
+
+- Crea clases para testear announcements.. 
+- ContexTests>>#tearDown Modifica method properties 
 Que aprendimos de Pharo:
 
 
