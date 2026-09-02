@@ -1,6 +1,6 @@
 Extension { #name : 'ThisContextVariable' }
 
-{ #category : '*Domains' }
+{ #category : '*Domain-Overrides' }
 ThisContextVariable >> emitValue: methodBuilder [
 
 	(Domain isActive not or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)])
