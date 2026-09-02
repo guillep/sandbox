@@ -68,7 +68,7 @@ NOTA: Redo after fixing finalization + test resources.
 
 Que aprendimos de la biblioteca y sus tests: 
 - global state
-- 
+
 ## Microdown
 - 365 green
 - 338 red
@@ -83,11 +83,13 @@ Que aprendimos de la biblioteca y sus tests:
 
 
 ## Kernel
-- 5945 green
-- 32 red
+- 963 green
+- 557 red
+- 11 yellow
 
 Que aprendimos del sandbox: 
-
+- still keep references when using pointersTo
+- We add message sends on the instrumented method, so refective access (to the bytecode and literals) expose details
 
 Que aprendimos de la biblioteca y sus tests: 
 
@@ -102,18 +104,50 @@ Que aprendimos de la biblioteca y sus tests:
 	self assert: (testingEnvironment keys includes: class name)
 ```
 
-- Crea clases para testear announcements.. 
-- ContexTests>>#tearDown Modifica method properties 
+- Crea clases para testear announcements.
+- ContexTests>>#tearDown Modifica method properties
+- lint iterates the system and uses a global progress bar
+- global undeclareds
+- class properties
+- the global undo manager listens to ProtocolAdded announcement, and the test raises it (testCompileClassifiedWithProtocolInstance)
+- uses finalization
+
 Que aprendimos de Pharo:
+- Abstract SUnit test classes should run tests in subclasses when clicking on them?
+- Should we ban extensions on test cases?
+- *AFFECTS THE SANDBOX* reflection bug. When object is read only, object:instVarAt:put: fails with subscript out of bounds.
 
+```
+a := 1 @ 2.
+a beReadOnlyObject.
 
+"Ok"
+a setX: 2 setY:  4.
 
+"Ok"
+a instVarAt: 1 put: 4.
 
+"BUG"
+a instVarNamed: #x put: 4.
 
-Kernel-Tests 
+"BUG"
+a class slots first write: 4 to: a.
 
-Que aprendimos? ProtoObject no anda con el sandbox, no lo podemos ownear.
+"Inherited from context"
+```
 
+- border #signalLowSpace signals a runtime semaphore
+- Processor activeProcess evaluate: [ result := TestDynamicVariable value ] onBehalfOf: process.
+- AnnouncementSet #, has a side effect!!!
+- newAnonymousSubclass yields a class that raises (global) announcements when adding a method on them
+- AST cache
+- RecursionStopper wat
+- testMultiProcessWaitOnSameDelay : If we own a process, shoyld we own all its contexts?
+- testSteppingSendsDirectSend : step breaks the semantics of Pharo! Because you can leave a context suspended in a non normal place.
+- if error in test/setup and in teardown, the teardown error hides the original error
+- accessing a method sourceCode somehow fails, it will decompile the method...
+- Monticello is listening package added events!!
+- 
 
 ## Refactoring
 - 5945 green
