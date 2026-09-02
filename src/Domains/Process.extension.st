@@ -11,8 +11,27 @@ Process >> currentDomain [
 Process >> currentDomain: aDomain [
 
 	<nonDomainMediated>
-	currentDomain := aDomain.
-	currentDomainIsDefault := aDomain isNil
+	"Context>>step may step over the following code non atomically.
+	Thus, we could observe these variables in an incoherent state.
+	
+	The code below manages two cases:
+		defaultDomain (nil) -> non default domain (sandbox)
+		non default domain (sandbox) -> defaultDomain (nil)
+		
+	What should happen in the following case?
+		non default domain (sandbox1) -> non default domain (sandbox2)
+	"
+	aDomain
+		ifNil: [
+			"If the new domain is nil, first tell the process to use the default.
+			Thus, the currentDomain will not be used."
+			currentDomainIsDefault := aDomain == nil.
+			currentDomain := aDomain ]
+		ifNotNil: [
+			"If the new domain is not nil, first set it.
+			It will not be used until the flag is set"
+			currentDomain := aDomain.
+			currentDomainIsDefault := aDomain == nil ]
 ]
 
 { #category : '*Domains' }
@@ -43,8 +62,7 @@ Process >> popScope [
 
 	<nonDomainMediated>
 	currentDomain ifNotNil: [
-		currentDomain := currentDomain previous.
-		currentDomainIsDefault := currentDomain isNil]
+		self currentDomain: currentDomain previous ]
 ]
 
 { #category : '*Domains' }
@@ -56,6 +74,5 @@ Process >> pushScope: aDomain [
 	aDomain ifNotNil: [
 		aDomain previous: previousScope ].
 	
-	currentDomain := aDomain.
-	currentDomainIsDefault := aDomain isNil
+	self currentDomain: aDomain
 ]
