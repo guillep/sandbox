@@ -35,7 +35,7 @@ Sandbox >> allocateClass: aClass [
 	If the array did not grow the following line will do nothing because the array is already there.
 	If the array did grow, it will not grow again right away, the next grow threshold is faaar away.
 	Should we remove the old array?"
-	self own: owned array.
+	"self own: owned array."
 	
 	Processor activeProcess currentDomain: self.
 	^ newInstance
@@ -99,10 +99,8 @@ Sandbox >> initialize [
 Sandbox >> own: newInstance [
 
 	newInstance isImmediateObject ifTrue: [ ^ newInstance ].
-	newInstance isBehavior
-		ifTrue: [ ownedBehaviors add: newInstance ]
-		ifFalse: [ owned add: newInstance ].
-		
+	[owned add: newInstance]
+		on: Exception do: [ ownedBehaviors add: newInstance ].		
 	^newInstance 
 ]
 
@@ -119,9 +117,11 @@ Sandbox >> ownContext: newInstance [
 { #category : 'writing' }
 Sandbox >> owns: newInstance [
 
-	^ newInstance isClass
-		ifTrue: [ ownedBehaviors includes: newInstance ]
-		ifFalse: [ owned includes: newInstance ]
+	| basicOwnership |
+	basicOwnership := [ owned includes: newInstance ]
+		on: Exception do: [ :err | ^ ownedBehaviors includes: newInstance ].
+	
+	^ basicOwnership or: [ ownedBehaviors includes: newInstance ]
 ]
 
 { #category : 'accessing' }
