@@ -105,6 +105,7 @@ Que aprendimos de la biblioteca y sus tests:
 ```
 
 - Crea clases para testear announcements.
+- Compila metodos para testear package de extension methods .Tocando el sources file stream (global)
 - ContexTests>>#tearDown Modifica method properties
 - lint iterates the system and uses a global progress bar
 - global undeclareds
