@@ -7,6 +7,9 @@ ProcessorScheduler >> activeProcess [
 	(like during the code simulation in the debugger)"
 
 	<noInstrumentation>
+	
+	"Do not instrument/mediate this method"
 	<nonDomainMediated>
+	
 	^ activeProcess effectiveProcess
 ]

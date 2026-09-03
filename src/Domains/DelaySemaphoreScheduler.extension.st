@@ -4,6 +4,7 @@ Extension { #name : 'DelaySemaphoreScheduler' }
 DelaySemaphoreScheduler >> schedule: aDelay [
 	"This is the front-half of scheduling a delay. For back-half see #timingPrioritySchedule:"
 
+	"Override to allow waits in the sandbox"
 	<nonDomainMediated>
 
 	"Only one signal is sent when delay expires. Check if that is already spoken for"
@@ -16,7 +17,10 @@ DelaySemaphoreScheduler >> schedule: aDelay [
 
 { #category : '*Domains' }
 DelaySemaphoreScheduler >> unschedule: aDelay [
+
+	"Override to allow waits in the sandbox"
 	<nonDomainMediated>
+
 	readyToUnschedule  wait.  "Starts signalled. Resignalled from back-end #unscheduleAtTimingPriority"
 	delayToStop := aDelay.
 	timingSemaphore signal. "Transfer execution to back-end #unscheduleAtTimingPriority"

@@ -9,8 +9,11 @@ Dictionary >> removeKey: key ifAbsent: aBlock [
 	| index assoc |
 	index := self findElementOrNil: key.
 	assoc := (array at: index) ifNil: [ ^ aBlock value ].
+
+	"This override just inverts the effects below to capture it with i.v. sandbox"
 	tally := tally - 1.
 	array at: index put: nil.
+
 	self fixCollisionsFrom: index.
 	^ assoc value
 ]
