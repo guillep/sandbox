@@ -152,8 +152,9 @@ a class slots first write: 4 to: a.
 - 
 
 ## Refactoring
-- 5945 green
-- 32 red
+- 920 green
+- 32 Failures 
+- 184 red
 
 Que aprendimos del sandbox: 
 Que aprendimos de la biblioteca y sus tests: 
