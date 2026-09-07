@@ -75,9 +75,9 @@ Sandbox >> initialize [
 	super initialize.
 
 	owned := WeakIdentitySet new.
-	"owned add: self.
+	owned add: self.
 	owned add: owned.
-	owned add: owned array."
+	owned add: owned array.
 	
 	"Behaviors cannot be hashed before they are ready.
 	We capture them at basicNew and they have no superclass, method dict, nor format.
