@@ -105,6 +105,8 @@ Que aprendimos de la biblioteca y sus tests:
 ```
 
 - Crea clases para testear announcements.
+- Compila metodos para testear package de extension methods .Tocando el sources file stream (global)
+- Testeando packages modifica packages previamente existentes (testHasProperty)
 - ContexTests>>#tearDown Modifica method properties
 - lint iterates the system and uses a global progress bar
 - global undeclareds
@@ -150,28 +152,53 @@ a class slots first write: 4 to: a.
 - 
 
 ## Refactoring
-- 5945 green
-- 32 red
+- 920 green
+- 32 Failures 
+- 184 red
 
 Que aprendimos del sandbox: 
+
 Que aprendimos de la biblioteca y sus tests: 
+
+- El test esta usando ast en vez de parseTree (Ast usa una cache global de la meurte)
+- acceder al source code falla y un mal manejo de exceptiones da decompilado y falla todo
+- 
+
 Que aprendimos de Pharo:
 
+
+
 ## Roassal
-- 5945 green
-- 32 red
+-  301 green
+-  512 red
 
 Que aprendimos del sandbox: 
+- parametrizable tests. parameters may be instantiated class side. Who owns the watchmen?
+- 
+
 Que aprendimos de la biblioteca y sus tests: 
+- finalization and FFI are global
+- lazy initialized singleton
+
 Que aprendimos de Pharo:
 
 ## AST, Opal
-- 5945 green
-- 32 red
+- 7195 green
+- 713 red
+- 17 yellow
 
 Que aprendimos del sandbox: 
+
 Que aprendimos de la biblioteca y sus tests: 
+- le pide el ast que pasa por la cache global cuando parece que el parsetree que no es global es suficiente
+- le pega al formatter
+- decompilationnnn
+- global announcersss
+- writes to source file
+
 Que aprendimos de Pharo:
+- ya lo sabiamos pero compilar codigo sin instalarlo toquetea las undeclared globales
+
 
 
 # Ideas
