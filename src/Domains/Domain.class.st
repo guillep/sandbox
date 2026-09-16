@@ -17,7 +17,7 @@ Domain class >> activate [
 
 	self isActive ifTrue: [ ^ self ].
 	IsActive := true.
-	self recompile
+	self recompileSystem
 ]
 
 { #category : 'testing' }
@@ -25,7 +25,7 @@ Domain class >> deactivate [
 
 	self isActive ifFalse: [ ^ self ].
 	IsActive := false.
-	self recompile
+	self recompileSystem
 ]
 
 { #category : 'class initialization' }
@@ -46,7 +46,7 @@ Domain class >> isActive [
 ]
 
 { #category : 'testing' }
-Domain class >> recompile [
+Domain class >> recompileSystem [
 
 	OpalCompiler recompileAll.
 ]
