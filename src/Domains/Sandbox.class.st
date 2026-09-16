@@ -9,7 +9,7 @@ Class {
 	#superclass : 'Domain',
 	#instVars : [
 		'ownedBehaviors',
-		'classVarValues'
+		'bindings'
 	],
 	#category : 'Domains',
 	#package : 'Domains'
@@ -19,6 +19,14 @@ Class {
 Sandbox class >> do: aBlock [
 
 	^ self new do: aBlock
+]
+
+{ #category : 'enumerating' }
+Sandbox class >> with: bindings do: aBlock [
+
+	^ self new
+		bindings: bindings asDictionary;
+		do: aBlock
 ]
 
 { #category : 'writing' }
@@ -53,6 +61,18 @@ Sandbox >> allocateClass: aClass size: sizeRequested [
 
 	Processor activeProcess currentDomain: self.
 	^ newInstance
+]
+
+{ #category : 'accessing' }
+Sandbox >> bindings [
+
+	^ bindings
+]
+
+{ #category : 'accessing' }
+Sandbox >> bindings: anObject [
+
+	bindings := anObject
 ]
 
 { #category : 'writing' }
@@ -131,24 +151,13 @@ Sandbox >> previous: aPreviousScope [
 ]
 
 { #category : 'writing' }
-Sandbox >> readClassVariable: slot [
+Sandbox >> readClassVariable: classVariableSlot [
 
 	<nonDomainMediated>	
-	"Well, you can read a class variable, but only a copy/memento of the original.
-	This way we will be able to write into it."
-	| value val |
-	value := classVarValues at: slot ifAbsent: nil.
-	
-	value
-		ifNil: [
-			val := slot value.
-			val isBehavior
-				ifTrue: [ val ]
-				ifFalse: [ val := val copy ]]
-		ifNotNil: [ val := value ].
-	
-	classVarValues at: slot put: val.
-	^ val
+
+	bindings at: classVariableSlot
+		ifPresent: [ :replacementObject | ^ replacementObject ].
+	^ classVariableSlot value
 ]
 
 { #category : 'writing' }
@@ -177,6 +186,8 @@ Sandbox >> writeClassVariable: slot value: value [
 
 	<nonDomainMediated>	
 	"Nope!"
+	| classVarValues |
+	1halt.
 	classVarValues at: slot put: value.
 	^ value
 ]

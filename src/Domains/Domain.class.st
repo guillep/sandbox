@@ -15,17 +15,17 @@ Class {
 { #category : 'testing' }
 Domain class >> activate [
 
-	IsActive ifTrue: [ ^ self ].
+	self isActive ifTrue: [ ^ self ].
 	IsActive := true.
-	OpalCompiler recompileAll.
+	self recompile
 ]
 
 { #category : 'testing' }
 Domain class >> deactivate [
 
-	IsActive ifFalse: [ ^ self ].
+	self isActive ifFalse: [ ^ self ].
 	IsActive := false.
-	OpalCompiler recompileAll.
+	self recompile
 ]
 
 { #category : 'class initialization' }
@@ -43,6 +43,12 @@ Domain class >> isActive [
 	<nonDomainMediated>
 	"By default domains are not active"
 	^ IsActive ifNil: [ IsActive := false ]
+]
+
+{ #category : 'testing' }
+Domain class >> recompile [
+
+	OpalCompiler recompileAll.
 ]
 
 { #category : 'writing' }
