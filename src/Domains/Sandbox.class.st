@@ -9,7 +9,8 @@ Class {
 	#superclass : 'Domain',
 	#instVars : [
 		'ownedBehaviors',
-		'bindings'
+		'bindings',
+		'freshClassVars'
 	],
 	#category : 'Domains',
 	#package : 'Domains'
@@ -19,6 +20,26 @@ Class {
 Sandbox class >> do: aBlock [
 
 	^ self new do: aBlock
+]
+
+{ #category : 'enumerating' }
+Sandbox class >> forTest [
+
+	| newSymbols symbolTable theSlot theSandbox |
+	theSandbox := self new.
+	theSandbox do: [ :sb |
+			theSlot := OCASTCache class slotNamed: #default.
+			
+			newSymbols := SandboxNewSymbols new.
+			symbolTable := SandboxSymbolTable new.
+			sb bind: (Symbol bindingOf: #NewSymbols) to: newSymbols.
+			sb bind: (Symbol bindingOf: #SymbolTable) to: symbolTable.
+	
+			"sb simulateFreshClassVar: theSlot initialValue: OCASTCache new."
+			sb bind: (Smalltalk bindingOf: #Undeclared) to: UndeclaredRegistry new.
+	 ].
+
+	^ theSandbox
 ]
 
 { #category : 'enumerating' }
@@ -63,6 +84,15 @@ Sandbox >> allocateClass: aClass size: sizeRequested [
 	^ newInstance
 ]
 
+{ #category : 'as yet unclassified' }
+Sandbox >> bind: aClassVariableSlot to: anObject [
+
+	Processor activeProcess currentDomain: nil.
+	bindings at: aClassVariableSlot put: anObject.
+	Processor activeProcess currentDomain: self.
+	^ self
+]
+
 { #category : 'accessing' }
 Sandbox >> bindings [
 
@@ -77,22 +107,60 @@ Sandbox >> bindings: anObject [
 
 { #category : 'writing' }
 Sandbox >> do: aBlock [
+	"Activate the sandbox"
 
-	| popped |
-	popped := false.
+	| returnValue theError |
 	Processor activeProcess pushScope: self.
-	^ [
-		  [ aBlock value: self ]
-			  on: Exception
-			  do: [ :e |
-					  Processor activeProcess popScope.
-					  popped := true.
-					  e pass ] ] ensure: [ popped ifFalse: [ Processor activeProcess popScope ] ]
+
+	"Just catch the exception and do not pass/retry/resume.
+	This guarantees that all ensure blocks in between the signal and this method are executed with the sandbox enabled."
+	returnValue := [ aBlock value: self ]
+		               on: Exception
+		               do: [ :error | theError := error freeze ].
+
+	"Desactivate the sandbox"
+	Processor activeProcess popScope.
+
+	"Now check, if there was an error, tell the user"
+	theError ifNil: [ ^ returnValue ].
+	theError copy signal
+]
+
+{ #category : 'halting' }
+Sandbox >> halt [
+
+	"Utility for debugging purposes. Avoid the sandbox just in case"
+	<nonDomainMediated>
+	Processor activeProcess currentDomain: nil.
+	super halt.
+	Processor activeProcess currentDomain: self.
+]
+
+{ #category : 'halting' }
+Sandbox >> haltIf: aBlock [
+
+	"Utility for debugging purposes. Avoid the sandbox just in case"
+	<nonDomainMediated>
+	Processor activeProcess currentDomain: nil.
+	super haltIf: aBlock.
+	Processor activeProcess currentDomain: self.
+]
+
+{ #category : 'halting' }
+Sandbox >> haltIfTest [
+
+	"Utility for debugging purposes. Avoid the sandbox just in case"
+	<nonDomainMediated>
+	Processor activeProcess currentDomain: nil.
+	super haltIfTest.
+	Processor activeProcess currentDomain: self.
 ]
 
 { #category : 'initialization' }
 Sandbox >> initialize [
 	super initialize.
+
+	bindings := Dictionary new.
 
 	owned := WeakIdentitySet new.
 	owned add: self.
@@ -103,6 +171,7 @@ Sandbox >> initialize [
 	We capture them at basicNew and they have no superclass, method dict, nor format.
 	Store them in an ordered collection instead"
 	ownedBehaviors := WeakOrderedCollection new.
+	freshClassVars := Dictionary new.
 	
 	"classVarValues := Dictionary new.
 	owned add: classVarValues.
@@ -151,6 +220,14 @@ Sandbox >> previous: aPreviousScope [
 ]
 
 { #category : 'writing' }
+Sandbox >> readClassSlot: slot on: aClass [
+
+	<nonDomainMediated>
+	freshClassVars at: slot ifPresent: [ :v | ^ v ].
+	^ slot read: aClass
+]
+
+{ #category : 'writing' }
 Sandbox >> readClassVariable: classVariableSlot [
 
 	<nonDomainMediated>	
@@ -158,6 +235,16 @@ Sandbox >> readClassVariable: classVariableSlot [
 	bindings at: classVariableSlot
 		ifPresent: [ :replacementObject | ^ replacementObject ].
 	^ classVariableSlot value
+]
+
+{ #category : 'writing' }
+Sandbox >> readGlobalVariable: globalVariableSlot [
+
+	<nonDomainMediated>	
+
+	bindings at: globalVariableSlot
+		ifPresent: [ :replacementObject | ^ replacementObject ].
+	^ globalVariableSlot value
 ]
 
 { #category : 'writing' }
@@ -181,6 +268,34 @@ Sandbox >> shallowCopy: anObject [
 	^ newInstance
 ]
 
+{ #category : 'as yet unclassified' }
+Sandbox >> simulateFreshClassVar: aClassSlot [
+
+	<nonDomainMediated>
+	self simulateFreshClassVar: aClassSlot initialValue: nil
+]
+
+{ #category : 'as yet unclassified' }
+Sandbox >> simulateFreshClassVar: aClassSlot initialValue: aValue [
+
+	<nonDomainMediated>
+	Processor activeProcess currentDomain: nil.
+
+	freshClassVars at: aClassSlot put: aValue.
+
+	Processor activeProcess currentDomain: self
+]
+
+{ #category : 'writing' }
+Sandbox >> writeClassSlot: slot on: object value: value [
+
+	<nonDomainMediated>
+	freshClassVars at: slot ifPresent: [ :v | 
+		freshClassVars at: slot put: v.
+		^ v ].
+	^ self writeSlot: slot on: object value: value
+]
+
 { #category : 'writing' }
 Sandbox >> writeClassVariable: slot value: value [
 
@@ -202,5 +317,5 @@ Sandbox >> writeSlot: slot on: object value: value [
 	
 	"Nope!"
 	Processor activeProcess popScope.
-	self error: 'Se te escapo la escritura'
+	self error: 'Escaping write'
 ]

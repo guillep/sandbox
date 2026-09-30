@@ -1,6 +1,6 @@
 Extension { #name : 'ClassVariable' }
 
-{ #category : '*Domains' }
+{ #category : '*Domain-Overrides' }
 ClassVariable >> emitStore: methodBuilder [
 	"generate store bytecode.
 	Does not pop the stored value!"
@@ -41,7 +41,7 @@ ClassVariable >> emitStore: methodBuilder [
 	methodBuilder jumpAheadTarget: #continue
 ]
 
-{ #category : '*Domains' }
+{ #category : '*Domain-Overrides' }
 ClassVariable >> emitValue: methodBuilder [
 
 	(Domain isActive not or: [(methodBuilder rawIR hasPragmaNamed: #nonDomainMediated)]) ifTrue: [
