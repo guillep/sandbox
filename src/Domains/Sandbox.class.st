@@ -25,19 +25,25 @@ Sandbox class >> do: aBlock [
 { #category : 'enumerating' }
 Sandbox class >> forTest [
 
-	| newSymbols symbolTable theSlot theSandbox |
+	| newSymbols symbolTable theSandbox |
 	theSandbox := self new.
 	theSandbox do: [ :sb |
-			theSlot := OCASTCache class slotNamed: #default.
-			
 			newSymbols := SandboxNewSymbols new.
 			symbolTable := SandboxSymbolTable new.
-			sb bind: (Symbol bindingOf: #NewSymbols) to: newSymbols.
-			sb bind: (Symbol bindingOf: #SymbolTable) to: symbolTable.
-	
-			"sb simulateFreshClassVar: theSlot initialValue: OCASTCache new."
-			sb bind: (Smalltalk bindingOf: #Undeclared) to: UndeclaredRegistry new.
-	 ].
+			sb
+				simulateFreshClassVar: (Symbol bindingOf: #NewSymbols)
+				initialValue: newSymbols.
+			sb
+				simulateFreshClassVar: (Symbol bindingOf: #SymbolTable)
+				initialValue: symbolTable.
+
+			sb
+				simulateFreshClassVar: (OCASTCache class slotNamed: #default)
+				initialValue: OCASTCache new.
+
+			sb
+				simulateFreshClassVar: (Smalltalk bindingOf: #Undeclared)
+				initialValue: UndeclaredRegistry new ].
 
 	^ theSandbox
 ]
@@ -48,6 +54,14 @@ Sandbox class >> with: bindings do: aBlock [
 	^ self new
 		bindings: bindings asDictionary;
 		do: aBlock
+]
+
+{ #category : 'writing' }
+Sandbox >> _own: newInstance [
+
+	newInstance isImmediateObject ifTrue: [ ^ newInstance ].
+	owned add: newInstance.
+	^newInstance 
 ]
 
 { #category : 'writing' }
@@ -84,27 +98,6 @@ Sandbox >> allocateClass: aClass size: sizeRequested [
 	^ newInstance
 ]
 
-{ #category : 'as yet unclassified' }
-Sandbox >> bind: aClassVariableSlot to: anObject [
-
-	Processor activeProcess currentDomain: nil.
-	bindings at: aClassVariableSlot put: anObject.
-	Processor activeProcess currentDomain: self.
-	^ self
-]
-
-{ #category : 'accessing' }
-Sandbox >> bindings [
-
-	^ bindings
-]
-
-{ #category : 'accessing' }
-Sandbox >> bindings: anObject [
-
-	bindings := anObject
-]
-
 { #category : 'writing' }
 Sandbox >> do: aBlock [
 	"Activate the sandbox"
@@ -116,7 +109,9 @@ Sandbox >> do: aBlock [
 	This guarantees that all ensure blocks in between the signal and this method are executed with the sandbox enabled."
 	returnValue := [ aBlock value: self ]
 		               on: Exception
-		               do: [ :error | theError := error freeze ].
+		               do: [ :error |
+				               "theError := error freeze."
+				               thisProcess unmediatedDo: [ error pass ] ].
 
 	"Desactivate the sandbox"
 	Processor activeProcess popScope.
@@ -160,8 +155,6 @@ Sandbox >> haltIfTest [
 Sandbox >> initialize [
 	super initialize.
 
-	bindings := Dictionary new.
-
 	owned := WeakIdentitySet new.
 	owned add: self.
 	owned add: owned.
@@ -179,12 +172,29 @@ Sandbox >> initialize [
 ]
 
 { #category : 'writing' }
+Sandbox >> newProcess: aClosure [
+
+	<nonDomainMediated>
+	| newInstance |
+	
+	Processor activeProcess currentDomain: nil.
+	newInstance := [ thisProcess currentDomain: self. aClosure value ] basicNewProcess.
+	
+	self own: newInstance.
+	
+	Processor activeProcess currentDomain: self.
+	^ newInstance
+]
+
+{ #category : 'writing' }
 Sandbox >> own: newInstance [
 
 	newInstance isImmediateObject ifTrue: [ ^ newInstance ].
-	[owned add: newInstance]
-		on: Exception do: [ ownedBehaviors add: newInstance ].		
-	^newInstance 
+	thisProcess unmediatedDo: [
+			[ owned add: newInstance ]
+				on: Exception
+				do: [ :error | ownedBehaviors add: newInstance ] ].
+	^ newInstance
 ]
 
 { #category : 'writing' }
@@ -232,7 +242,7 @@ Sandbox >> readClassVariable: classVariableSlot [
 
 	<nonDomainMediated>	
 
-	bindings at: classVariableSlot
+	freshClassVars at: classVariableSlot
 		ifPresent: [ :replacementObject | ^ replacementObject ].
 	^ classVariableSlot value
 ]
@@ -242,7 +252,7 @@ Sandbox >> readGlobalVariable: globalVariableSlot [
 
 	<nonDomainMediated>	
 
-	bindings at: globalVariableSlot
+	freshClassVars at: globalVariableSlot
 		ifPresent: [ :replacementObject | ^ replacementObject ].
 	^ globalVariableSlot value
 ]
@@ -281,9 +291,8 @@ Sandbox >> simulateFreshClassVar: aClassSlot initialValue: aValue [
 	<nonDomainMediated>
 	Processor activeProcess currentDomain: nil.
 
-	freshClassVars at: aClassSlot put: aValue.
-
-	Processor activeProcess currentDomain: self
+	[freshClassVars at: aClassSlot put: aValue.]
+		ensure: [Processor activeProcess currentDomain: self]
 ]
 
 { #category : 'writing' }
