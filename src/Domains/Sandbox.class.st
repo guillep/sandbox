@@ -343,10 +343,10 @@ Sandbox >> writeClassSlot: slot on: aClass value: value [
 				- if we don't, continue with the normal write"
 							classInstVarInitialValues at: slot ifPresent: [ :initialValue |
 									classVars at: slot put: value.
-									^ value ] ] ].
-
+									^ value ] ] ] ].
+					
 		"Otherwise, write to the environment"
-		^ self writeSlot: slot on: aClass value: value ]
+		^ self writeSlot: slot on: aClass value: value
 ]
 
 { #category : 'writing' }
