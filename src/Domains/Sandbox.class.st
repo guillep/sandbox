@@ -10,7 +10,9 @@ Class {
 	#instVars : [
 		'ownedBehaviors',
 		'bindings',
-		'freshClassVars'
+		'freshClassVars',
+		'classInstVarInitialValues',
+		'freshClassInstVars'
 	],
 	#category : 'Domains',
 	#package : 'Domains'
@@ -43,7 +45,12 @@ Sandbox class >> forTest [
 
 			sb
 				simulateFreshClassVar: (Smalltalk bindingOf: #Undeclared)
-				initialValue: UndeclaredRegistry new ].
+				initialValue: UndeclaredRegistry new.
+			
+			sb
+				simulateFreshClassVar: (TestCase class slotNamed: #history)
+				initialValue: TestCase newTestDictionary.
+	].
 
 	^ theSandbox
 ]
@@ -103,18 +110,18 @@ Sandbox >> do: aBlock [
 	"Activate the sandbox"
 
 	| returnValue theError |
-	Processor activeProcess pushScope: self.
+	thisProcess pushScope: self.
 
 	"Just catch the exception and do not pass/retry/resume.
 	This guarantees that all ensure blocks in between the signal and this method are executed with the sandbox enabled."
 	returnValue := [ aBlock value: self ]
 		               on: Exception
-		               do: [ :error |
-				               "theError := error freeze."
-				               thisProcess unmediatedDo: [ error pass ] ].
+		               do: [ :error | "theError := error freeze."
+				               thisProcess popScope.
+				               error pass ].
 
 	"Desactivate the sandbox"
-	Processor activeProcess popScope.
+	thisProcess popScope.
 
 	"Now check, if there was an error, tell the user"
 	theError ifNil: [ ^ returnValue ].
@@ -165,6 +172,8 @@ Sandbox >> initialize [
 	Store them in an ordered collection instead"
 	ownedBehaviors := WeakOrderedCollection new.
 	freshClassVars := Dictionary new.
+	freshClassInstVars := Dictionary new.
+	classInstVarInitialValues := Dictionary new.
 	
 	"classVarValues := Dictionary new.
 	owned add: classVarValues.
@@ -233,8 +242,24 @@ Sandbox >> previous: aPreviousScope [
 Sandbox >> readClassSlot: slot on: aClass [
 
 	<nonDomainMediated>
-	freshClassVars at: slot ifPresent: [ :v | ^ v ].
-	^ slot read: aClass
+	Processor activeProcess currentDomain: nil.
+
+	[  | classVars |
+		"Check for overrides per class"
+		classVars := freshClassInstVars at: aClass ifAbsentPut: [ Dictionary new ].
+
+		"If we have it, return it"
+		classVars at: slot ifPresent: [ :v | ^ v ] ifAbsent: [
+			(aClass isKindOf: slot definingClass) ifTrue: [
+				"Otherwise
+					- if we have an initial value, set it for next time and return it
+					- if we don't, continue with the normal read"
+					classInstVarInitialValues at: slot ifPresent: [ :initialValue |
+							classVars at: slot put: initialValue.
+							^ initialValue ] ] ].
+
+		"Otherwise, read from the environment"
+		^ slot read: aClass ] ensure: [ Processor activeProcess currentDomain: self ]
 ]
 
 { #category : 'writing' }
@@ -291,18 +316,37 @@ Sandbox >> simulateFreshClassVar: aClassSlot initialValue: aValue [
 	<nonDomainMediated>
 	Processor activeProcess currentDomain: nil.
 
-	[freshClassVars at: aClassSlot put: aValue.]
-		ensure: [Processor activeProcess currentDomain: self]
+	[
+		aClassSlot isClassVariable
+			ifTrue: [ freshClassVars at: aClassSlot put: aValue ]
+			ifFalse: [ classInstVarInitialValues at: aClassSlot put: aValue ] ]
+				ensure: [ Processor activeProcess currentDomain: self ]
 ]
 
 { #category : 'writing' }
-Sandbox >> writeClassSlot: slot on: object value: value [
+Sandbox >> writeClassSlot: slot on: aClass value: value [
 
 	<nonDomainMediated>
-	freshClassVars at: slot ifPresent: [ :v | 
-		freshClassVars at: slot put: v.
-		^ v ].
-	^ self writeSlot: slot on: object value: value
+	| classVars |
+	thisProcess unmediatedDo: [
+		classVars := freshClassInstVars at: aClass ifAbsentPut: [ Dictionary new ].
+
+		"If we have it, write it"
+		classVars
+			at: slot
+			ifPresent: [ :v |
+					classVars at: slot put: value.
+					^ value ]
+			ifAbsent: [
+					(aClass isKindOf: slot definingClass) ifTrue: [ "Otherwise
+				- if we have an initial value, override with our value!
+				- if we don't, continue with the normal write"
+							classInstVarInitialValues at: slot ifPresent: [ :initialValue |
+									classVars at: slot put: value.
+									^ value ] ] ].
+
+		"Otherwise, write to the environment"
+		^ self writeSlot: slot on: aClass value: value ]
 ]
 
 { #category : 'writing' }

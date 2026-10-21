@@ -76,3 +76,12 @@ Process >> pushScope: aDomain [
 	
 	self currentDomain: aDomain
 ]
+
+{ #category : '*Domains' }
+Process >> unmediatedDo: aBlock [
+
+	| domain |
+	domain := self currentDomain.
+	self currentDomain: nil.
+	aBlock ensure: [ self currentDomain: domain ].
+]
