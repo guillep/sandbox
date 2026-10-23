@@ -45,7 +45,7 @@ DomainExperiments >> runFor: packageUnderTest [
 { #category : 'as yet unclassified' }
 DomainExperiments >> runForAll [
 
-	^ self runForAll: #( Roassal AST Opal Refactoring Kernel Microdown Enlumineur FileSystem Clap Collections SUnit Zinc )
+	^ self runForAll: #( Roassal AST Opal Refactoring Kernel Microdown Enlumineur FileSystem Clap Collections Zinc )
 ]
 
 { #category : 'as yet unclassified' }
