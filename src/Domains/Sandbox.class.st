@@ -42,14 +42,12 @@ Sandbox class >> forTest [
 			sb
 				simulateFreshClassVar: (OCASTCache class slotNamed: #default)
 				initialValue: OCASTCache new.
+				
+			sb simulateFreshClassVar: (FFIExternalResourceManager class slotNamed: #uniqueInstance).
 
 			sb
 				simulateFreshClassVar: (Smalltalk bindingOf: #Undeclared)
 				initialValue: UndeclaredRegistry new.
-			
-			sb
-				simulateFreshClassVar: (TestCase class slotNamed: #history)
-				initialValue: TestCase newTestDictionary.
 	].
 
 	^ theSandbox

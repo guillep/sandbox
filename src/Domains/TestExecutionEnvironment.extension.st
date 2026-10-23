@@ -5,7 +5,7 @@ TestExecutionEnvironment >> runTestCaseUnderWatchdog: aTestCase [
 
 	[
 		[
-			Sandbox forTest do: [ :sb |
+			Sandbox do: [ :sb |
 					self assert: thisProcess currentDomain notNil.
 
 					"Make the test resources available outside of the sandbox.
