@@ -368,5 +368,8 @@ Sandbox >> writeSlot: slot on: object value: value [
 	
 	"Nope!"
 	Processor activeProcess popScope.
-	self error: 'Escaping write'
+	SandboxViolation new
+		object: object;
+		slot: slot;
+		signal
 ]
