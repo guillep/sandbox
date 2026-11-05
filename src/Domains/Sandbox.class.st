@@ -265,9 +265,15 @@ Sandbox >> readClassVariable: classVariableSlot [
 
 	<nonDomainMediated>	
 
-	freshClassVars at: classVariableSlot
-		ifPresent: [ :replacementObject | ^ replacementObject ].
-	^ classVariableSlot value
+	| result |
+	thisProcess currentDomain: nil.
+	
+	result := freshClassVars at: classVariableSlot
+		ifPresent: [ :replacementObject | replacementObject ]
+		ifAbsent: [ classVariableSlot value ].
+
+	thisProcess currentDomain: self.
+	^ result
 ]
 
 { #category : 'writing' }
@@ -275,9 +281,7 @@ Sandbox >> readGlobalVariable: globalVariableSlot [
 
 	<nonDomainMediated>	
 
-	freshClassVars at: globalVariableSlot
-		ifPresent: [ :replacementObject | ^ replacementObject ].
-	^ globalVariableSlot value
+	^ self readClassVariable: globalVariableSlot
 ]
 
 { #category : 'writing' }
