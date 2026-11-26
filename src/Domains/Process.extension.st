@@ -53,7 +53,7 @@ Process >> initialize [
 	super initialize.
 
 	terminating := false.
-	shouldOverflow := true.
+	"shouldOverflow := true."
 	currentDomainIsDefault := true
 ]
 
